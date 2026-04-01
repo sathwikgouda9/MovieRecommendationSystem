@@ -62,3 +62,11 @@ json{
   "latency_ms": 12.4,
   "recommendations": ["m87", "m203", "m14", "m55", "m301"]
 }
+
+Stopping & Restarting later
+bash# Stop
+docker-compose down
+
+# Start again next time (no need to retrain)
+docker-compose up -d
+curl http://localhost:8000/recommend/u1
