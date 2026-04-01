@@ -1,0 +1,58 @@
+how to run the project step by step:
+
+1. Prerequisites
+Make sure these are installed on your machine:
+bashdocker --version        # Docker Desktop or Docker Engine
+docker-compose --version
+python --version        # Python 3.11+
+
+2. Unzip & enter the project
+bashunzip netflix-rec-system.zip
+cd netflix-rec-system
+
+3. Start all services
+bashdocker-compose up --build
+```
+This spins up **MongoDB**, **Redis**, **FastAPI server**, and the **Change Stream listener** all at once. Wait until you see:
+```
+app | Models ready.
+
+4. Seed data & train models (first time only)
+Open a new terminal tab and run:
+bashdocker-compose exec app python train.py
+This will:
+
+Seed 200 users, 500 movies, 10,000 interactions into MongoDB
+Train the Neural CF model
+Train the content-based model
+Save models to saved_models/
+
+
+5. Test the API
+Get recommendations:
+bashcurl http://localhost:8000/recommend/u1?last_item=m5&top_n=10
+Force refresh (bypass cache):
+bashcurl http://localhost:8000/recommend/u1?force_refresh=true
+Health check:
+bashcurl http://localhost:8000/health
+```
+
+Or open in browser:
+
+http://localhost:8000/docs
+FastAPI auto-generates an interactive Swagger UI where you can test all endpoints.
+
+6. Stopping the project
+bash# Stop all containers
+docker-compose down
+
+# Stop and delete all data (MongoDB volume)
+docker-compose down -v
+
+Expected API Response
+json{
+  "user_id": "u1",
+  "source": "model",
+  "latency_ms": 12.4,
+  "recommendations": ["m87", "m203", "m14", "m55", "m301"]
+}
